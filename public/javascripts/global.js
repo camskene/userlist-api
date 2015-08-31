@@ -3,9 +3,14 @@
 var userListData = [];
 
 $(document).ready(function() {
+  // populate user table on page load
   populateTable();
 
+  // show user info
   $('#userList').on('click', '.linkshowuser', showUserInfo);
+
+  // add user
+  $('#btnAddUser').on('click', addUser);
 });
 
 function populateTable() {
@@ -47,4 +52,51 @@ function showUserInfo(event) {
   $('#userInfoAge').text(thisUserObject.age);
   $('#userInfoGender').text(thisUserObject.gender);
   $('#userInfoLocation').text(thisUserObject.location);
+}
+
+function addUser(event) {
+  event.preventDefault();
+  // basic validation - increase error count if any fields are empty
+  var errorCount = 0;
+  $('#addUser input').each(function(index, val) {
+    if ( $(this).val() === '') {
+      errorCount++;
+    }
+  });
+
+  if (errorCount === 0) {
+    var newUser = {
+      'username': $('#inputUserName').val(),
+      'email': $('#inputUserEmail').val(),
+      'fullname': $('#inputUserFullname').val(),
+      'age': $('#inputUserAge').val(),
+      'location': $('#inputUserLocation').val(),
+      'gender': $('#inputUserGender').val()
+    }
+
+    $.ajax({
+      type: 'POST',
+      data: newUser,
+      url: '/users/adduser',
+      dataType: 'JSON'
+    }).done(function(res) {
+
+      // check for successful (blank) response
+      if (res.msg === '') {
+        // clear the form inputs
+        $('#addUser :input').val('');
+
+        // update the table
+        populateTable();
+      }
+      else {
+        alert('Error: ' + res.msg);
+      }
+    });
+  }
+  else {
+    // if error count > 0
+    alert('Please fill in all the fields');
+    return false;
+  }
 }
