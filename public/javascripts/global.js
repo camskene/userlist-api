@@ -11,6 +11,9 @@ $(document).ready(function() {
 
   // add user
   $('#btnAddUser').on('click', addUser);
+
+  // delete user
+  $('#userList').on('click', '.linkdeleteuser', deleteUser);
 });
 
 function populateTable() {
@@ -99,4 +102,32 @@ function addUser(event) {
     alert('Please fill in all the fields');
     return false;
   }
+}
+
+
+function deleteUser(event) {
+  event.preventDefault();
+
+  var confirmation = confirm('Delete, for realz?');
+
+  if (confirmation === true) {
+    $.ajax({
+      type: 'DELETE',
+      url: '/users/deleteuser/' + $(this).attr('rel')
+    }).done(function(res) {
+      if (res.msg === '') {
+      }
+      else {
+        alert('Error: ' + res.msg);
+      }
+
+      populateTable();
+    });
+  }
+  else {
+    // if they said no to the confirm
+    return false;
+  }
+
+
 }
